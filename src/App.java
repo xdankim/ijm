@@ -1,62 +1,112 @@
-import java.nio.file.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
-import java.awt.Toolkit;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 
 public class App {
 
-    public ArrayList<String> FileName = new ArrayList<>();
-    public ArrayList<String> FileLocation = new ArrayList<>();
-
-    public App(){
+    private App(){
         this.Render();
     }
-
     public static void main(String[] args) {
         new App();
     }
 
-    public void Render() {
+    private void Render(){
         try {
-            String folderTarget = JOptionPane.showInputDialog("Copy alamat folder untuk mod");
 
-            Path folderPath = Paths.get(folderTarget);
+            checkFolder();
 
-            Files.list(folderPath)
+            ArrayList<String> PathFileList = new ArrayList<>();
+            ArrayList<String> FileLocation = new ArrayList<>();
+
+            Files.list(Paths.get(Files.readString(readFile("C:\\Users\\User\\Downloads\\.path\\source.txt"))))
                 .filter(p -> p.toString().endsWith(".jar"))
                 .forEach(files -> {
-                    FileName.add(files.getFileName().toString());
+                    PathFileList.add(files.getFileName().toString());
                     FileLocation.add(files.toString());
                 });
 
-            String[] pilihan = FileName.toArray(new String[0]);
+            String[] option = PathFileList.toArray(new String[0]);
 
-            int file = JOptionPane.showOptionDialog(
-                null,
-                "pilih file untuk import ke mods",
-                "Files Available",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                pilihan,
-                null
-            );
+            JComboBox<String> comboBox = new JComboBox<>(option);
 
-            if (file == -1) return; // user cancel
+            int result = JOptionPane.showConfirmDialog(null, comboBox, "Mods Available", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 
-            Path targetDir = Paths.get("C:\\Users\\User\\AppData\\Roaming\\.tlauncher\\legacy\\Minecraft\\game\\mods");
-            Files.createDirectories(targetDir);
-            Path source = Paths.get(FileLocation.get(file));
-            Path target = targetDir.resolve(source.getFileName());
 
-            Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+            if (result == JOptionPane.OK_OPTION){
+                Path directory = Paths.get(Files.readString(readFile("C:\\Users\\User\\Downloads\\.path\\target.txt")));
+                Files.createDirectories(directory);
 
-            Toolkit.getDefaultToolkit().beep();
-            JOptionPane.showMessageDialog(null, "Mod Jar sudah terimport ke minecraft", "Succesfully Done", JOptionPane.INFORMATION_MESSAGE);
+                Path target = directory.resolve(PathFileList.get(comboBox.getSelectedIndex()));
+                
+                Files.copy(readFile(FileLocation.get(comboBox.getSelectedIndex())), target);
 
+                JOptionPane.showOptionDialog(null, "Import is done", "Successfully", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+            } else {
+                JOptionPane.showOptionDialog(null, "Import cancelled", "Successfully", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+            }
+             
+        } 
+        catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void createFile(String File){
+        try {
+            new File(File);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
-        } 
+        }
     }
+
+    public void WriteFile(String File, String text){
+        try {
+            FileWriter writefile = new FileWriter(File);
+            writefile.write(text);
+            writefile.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void checkFolder(){
+        try {
+            Path folder = Path.of("C:\\Users\\User\\Downloads\\.path");
+
+            if (Files.exists(folder)) return;
+            else {
+                JOptionPane.showMessageDialog(null, "File is missing 'C:\\Users\\User\\Downloads\\.path',\nYou should create this folder to use it!", "Error Message", JOptionPane.ERROR_MESSAGE, null);
+
+                Files.createDirectories(Path.of("C:\\Users\\User\\Downloads\\.path"));
+
+                createFile("C:\\Users\\User\\Downloads\\.path\\source.txt");
+                createFile("C:\\Users\\User\\Downloads\\.path\\target.txt");
+
+
+                String source = JOptionPane.showInputDialog("Paste your mods location");
+
+                WriteFile("C:\\Users\\User\\Downloads\\.path\\source.txt", source);
+
+                String target = JOptionPane.showInputDialog("Paste your .minecraft/mods folder as a default");
+
+                WriteFile("C:\\Users\\User\\Downloads\\.path\\target.txt", target);
+
+                JOptionPane.showMessageDialog(null, "Setup is finished! let start", "Successfully", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public Path readFile(String File){
+        return Paths.get(File);
+    }
+
 }
