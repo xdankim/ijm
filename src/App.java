@@ -10,8 +10,14 @@ import javax.swing.JOptionPane;
 
 public class App {
 
+    private final String home = System.getProperty("user.home");
+    private final String PathFolder = home + "\\Downloads\\.path";
+    private final String PathSourceTXT = PathFolder + "\\source.txt";
+    private final String PathTargetTXT = PathFolder + "\\target.txt";
+
     private App(){
         this.Render();
+        
     }
     public static void main(String[] args) {
         new App();
@@ -25,7 +31,7 @@ public class App {
             ArrayList<String> PathFileList = new ArrayList<>();
             ArrayList<String> FileLocation = new ArrayList<>();
 
-            Files.list(Paths.get(Files.readString(readFile("C:\\Users\\User\\Downloads\\.path\\source.txt"))))
+            Files.list(Paths.get(Files.readString(readFile(this.PathSourceTXT))))
                 .filter(p -> p.toString().endsWith(".jar"))
                 .forEach(files -> {
                     PathFileList.add(files.getFileName().toString());
@@ -36,20 +42,20 @@ public class App {
 
             JComboBox<String> comboBox = new JComboBox<>(option);
 
-            int result = JOptionPane.showConfirmDialog(null, comboBox, "Mods Available", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            int result = JOptionPane.showConfirmDialog(null, comboBox, "Available Mods", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 
             if (result == JOptionPane.OK_OPTION){
-                Path directory = Paths.get(Files.readString(readFile("C:\\Users\\User\\Downloads\\.path\\target.txt")));
+                Path directory = Paths.get(Files.readString(readFile(this.PathTargetTXT)));
                 Files.createDirectories(directory);
 
                 Path target = directory.resolve(PathFileList.get(comboBox.getSelectedIndex()));
                 
                 Files.copy(readFile(FileLocation.get(comboBox.getSelectedIndex())), target);
 
-                JOptionPane.showOptionDialog(null, "Import is done", "Successfully", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                JOptionPane.showOptionDialog(null, "The Mods just imported to Minecraft", "Successfully", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
             } else {
-                JOptionPane.showOptionDialog(null, "Import cancelled", "Successfully", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
+                JOptionPane.showOptionDialog(null, "Import Cancelled", "Cancelled", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, null, null);
             }
              
         } 
@@ -78,27 +84,27 @@ public class App {
 
     public void checkFolder(){
         try {
-            Path folder = Path.of("C:\\Users\\User\\Downloads\\.path");
+            Path folder = Path.of(this.PathFolder);
 
             if (Files.exists(folder)) return;
             else {
-                JOptionPane.showMessageDialog(null, "File is missing 'C:\\Users\\User\\Downloads\\.path',\nYou should create this folder to use it!", "Error Message", JOptionPane.ERROR_MESSAGE, null);
+                JOptionPane.showMessageDialog(null, "Folder is missing at "+ PathFolder +",\nYou should create that folder. Just click ok", "Error Message", JOptionPane.ERROR_MESSAGE, null);
 
-                Files.createDirectories(Path.of("C:\\Users\\User\\Downloads\\.path"));
+                Files.createDirectories(Path.of(this.PathFolder));
 
-                createFile("C:\\Users\\User\\Downloads\\.path\\source.txt");
-                createFile("C:\\Users\\User\\Downloads\\.path\\target.txt");
+                createFile(this.PathSourceTXT);
+                createFile(this.PathTargetTXT);
 
 
-                String source = JOptionPane.showInputDialog("Paste your mods location");
+                String source = JOptionPane.showInputDialog("Insert your current location of mods\nI recommend to copy the Downloads location");
 
-                WriteFile("C:\\Users\\User\\Downloads\\.path\\source.txt", source);
+                WriteFile(this.PathSourceTXT, source);
 
-                String target = JOptionPane.showInputDialog("Paste your .minecraft/mods folder as a default");
+                String target = JOptionPane.showInputDialog("Insert your .minecraft/mods location\nexample : C:\\User\\...\\.minecraft\\mods");
 
-                WriteFile("C:\\Users\\User\\Downloads\\.path\\target.txt", target);
+                WriteFile(this.PathTargetTXT, target);
 
-                JOptionPane.showMessageDialog(null, "Setup is finished! let start", "Successfully", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Set up is finished. Lets start", "Successfully", JOptionPane.INFORMATION_MESSAGE);
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.ERROR_MESSAGE);
