@@ -17,7 +17,7 @@ i should focus more about to improve my light project to everyone especially Min
 
 ## Download?
 
-> https://xdankim.github.io/ijm/
+> https://xdankim.github.io/ModsJarImport/
 
 ## Dependency Management
 
