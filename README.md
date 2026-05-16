@@ -9,6 +9,9 @@ A file that read the jar mods to copy and import them into Minecraft Java folder
 3. Copy your .minecraft/mods location. if you are using tlaucher just find the mods folder in there. (Location the original and crack version might be different)
 4. Choose your mods to copy and click ok
 
+- Mods located (default) : `C:\Users\{windowname}\Downloads`
+- Minecraft Folder : `C:\Users\{windowname}\AppData\Roaming\.minecraft`;
+
 ## Other
 
 i made two version of this file. Which i changed the language as English (default) and my language (Bahasa Melayu).
